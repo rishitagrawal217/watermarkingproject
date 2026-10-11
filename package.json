@@ -1,0 +1,15 @@
+{
+  "name": "sigil",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Hybrid digital watermarking + steganography + tamper authentication",
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w web\"",
+    "test": "npm test -w server",
+    "experiments": "npm run experiments -w server",
+    "build": "npm run build -w web",
+    "start": "npm run build -w web && npm run start -w server"
+  },
+  "devDependencies": { "concurrently": "^9.0.0" }
+}

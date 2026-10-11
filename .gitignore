@@ -1,0 +1,5 @@
+node_modules
+web/dist
+results/tmp
+.DS_Store
+*.log
