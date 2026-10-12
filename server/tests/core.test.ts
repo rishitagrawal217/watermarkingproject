@@ -92,6 +92,15 @@ describe("hybrid pipeline", () => {
     }
   });
 
+  it("limitation: a splice between images sealed with the SAME key and SAME image_id is not detected (IDs must be unique)", () => {
+    const a = H.embedAll(imgs[1].img, logo, "x", KEY, "shared-id");
+    const b = H.embedAll(imgs[5].img, logo, "x", KEY, "shared-id");
+    const t = { ...a, data: a.data.slice() };
+    for (let y = 64; y < 128; y++) for (let x = 128; x < 192; x++) t.data[y * 512 + x] = b.data[y * 512 + x];
+    expect(msbChangeMap(a, t).some((v) => v)).toBe(true);
+    expect(H.verifyTags(t, KEY, "shared-id").some((v) => v)).toBe(false);
+  });
+
   it("capacity limit: max payload fits, one block more throws", () => {
     const n = H.maxPayloadBytes(512, 512), p = randomBytes(n, 1);
     const prot = H.embedAll(imgs[1].img, logo, p, KEY, ID);

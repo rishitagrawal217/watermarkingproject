@@ -41,5 +41,6 @@ POST /api/analyze  { image(dataURL, 512×512), key, imageId, attack, seed }
 ## Notes
 - Save protected images as **PNG**. The LSB payload and the tags are fragile by design: any lossy processing destroys them (the watermark is what survives).
 - Keys, permutations and the PRNG are specific to this implementation (xoshiro128\*\* seeded from HMAC sub-keys), so images sealed by the old Python version do not verify here.
+- **Use a unique `imageId` per image.** The ID is what makes tags image-specific; two images sealed with the same key *and* the same ID can be spliced together undetected (the Studio generates a fresh ID for you). Region tampering also destroys the encrypted payload, since it is spread over the whole image.
 - The Benchmarks tab renders `results/results.json` as-is; nothing is typed in by hand.
 - Memory in E6 is the growth of peak RSS in a fresh child process during one call (coarse).

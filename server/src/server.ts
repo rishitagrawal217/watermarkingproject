@@ -3,7 +3,7 @@ import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import Fastify from "fastify";
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ATTACKS } from "./core/attacks.js";
 import { decodeGray, encodePng, listFolder, makeLogo, toGray } from "./core/dataset.js";
@@ -25,7 +25,7 @@ class HttpError extends Error { constructor(public status: number, msg: string) 
 const need = (cond: unknown, status: number, msg: string) => { if (!cond) throw new HttpError(status, msg); };
 
 const sampleFiles = () => (existsSync(SAMPLES) ? listFolder(SAMPLES) : []);
-const sampleName = (f: string) => f.split("/").pop()!.replace(/\.[^.]+$/, "");
+const sampleName = (f: string) => basename(f, extname(f));
 const findSample = (name: string) => sampleFiles().find((f) => sampleName(f) === name);
 
 async function loadCover(body: { image?: string; sample?: string }): Promise<Gray> {

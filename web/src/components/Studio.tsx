@@ -4,6 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnalyzeRes, Meta, ProtectRes, api } from "../api";
 import { BitGrid, Card, Gauge, Pill, Spinner, TamperImage, cn } from "./ui";
 
+/** Each image needs its own ID: the ID is what makes a tag image-specific, so two images sealed with the same key AND ID can be spliced undetected. */
+const newImageId = () => `img-${Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+
 const fileToDataUrl = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f); });
 
 function CompareSlider({ a, b, labelA, labelB }: { a: string; b: string; labelA: string; labelB: string }) {
@@ -44,7 +47,7 @@ export default function Studio({ meta }: { meta: Meta }) {
   const [upload, setUpload] = useState<string | null>(null);
   const [key, setKey] = useState("my secret passphrase");
   const [showKey, setShowKey] = useState(false);
-  const [imageId, setImageId] = useState("photo-001");
+  const [imageId, setImageId] = useState(newImageId);
   const [payload, setPayload] = useState("© Alice Studio · licence #4711 · issued 2026-10");
   const [sealing, setSealing] = useState(false);
   const [sealErr, setSealErr] = useState<string | null>(null);
@@ -122,7 +125,11 @@ export default function Studio({ meta }: { meta: Meta }) {
             </label>
             <label className="block">
               <span className="mb-1.5 block text-xs text-mute">Image ID (bound into every tag)</span>
-              <input value={imageId} onChange={(e) => setImageId(e.target.value)} spellCheck={false} className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-2.5 font-mono text-sm" />
+              <div className="relative">
+                <input value={imageId} onChange={(e) => setImageId(e.target.value)} spellCheck={false} className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-2.5 pr-10 font-mono text-sm" />
+                <button type="button" onClick={() => setImageId(newImageId())} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-mute hover:text-ink" aria-label="generate a new image ID" title="Generate a new unique ID"><RefreshCw className="size-4" /></button>
+              </div>
+              <span className="mt-1.5 block text-[11px] leading-snug text-mute/80">Use a different ID for every image — two images sealed with the same key and ID can be spliced together without detection.</span>
             </label>
             <label className="block">
               <span className="mb-1.5 flex items-center justify-between text-xs text-mute"><span>Hidden payload (encrypted)</span>
